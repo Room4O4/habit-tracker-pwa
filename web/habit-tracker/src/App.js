@@ -43,16 +43,15 @@ function App() {
         id: '2',
         description: 'Wake up at 5 AM'
       }
-    ],
-    timeSeries: []
+    ]
   });
+  const [timeSeries, setTimeSeries] = useState([]);
 
   const MAX_DAYS = 30;
   const [startDate, setStartDate] = useState(+new Date());
   const [count, setCount] = useState(0);
 
   const checkBoxClicked = habitInfo => {
-    const timeSeries = [...userData.timeSeries];
     const foundEntry = timeSeries.find(item => item.date.getTime() === habitInfo.date.getTime());
     if (!foundEntry) {
       timeSeries.push({
@@ -68,19 +67,13 @@ function App() {
         foundEntry.habitIds.splice(habitIndex, 1);
       }
     }
-    // setUserData({
-    //   userName: userData.userName,
-    //   habits: userData.habits,
-    //   timeSeries: [...timeSeries]
-    // });
-    // setStartDate(+new Date());
-    setCount(count + 1);
-    console.log(timeSeries);
+    setTimeSeries([...timeSeries]);
   };
 
   const renderCheckBox = (habitId, date) => {
-    const foundEntry = userData.timeSeries.find(entry => entry.date.getTime() === date.getTime());
-    if (foundEntry && foundEntry.habits && foundEntry.habits.contains(habitId)) {
+    const foundEntry = timeSeries.find(entry => entry.date.getTime() === date.getTime());
+    console.log('habitId - ' + habitId + ', foundEntry - ' + foundEntry);
+    if (foundEntry && foundEntry.habitIds.includes(habitId)) {
       return <CheckCircleOutlineRoundedIcon />;
     } else {
       return <CheckBoxOutlineBlankIcon />;
@@ -93,7 +86,6 @@ function App() {
         .add(dayNumber, 'days')
         .format('DD-MM-YYYY');
       const dateObj = moment(dateId, 'DD-MM-YYYY').toDate();
-
       return (
         <div
           className={classes.checkBoxHolder}
