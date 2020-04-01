@@ -8,10 +8,9 @@ import moment from 'moment';
 
 import { styles } from '../../styles/Home/index.styles';
 
+const Home = props => {
+  const { classes } = props;
 
-const Home = (props) => {
-  const {classes} = props;
-  
   const [userData, setUserData] = useState({
     userName: '',
     habits: [
@@ -99,6 +98,6 @@ const Home = (props) => {
       })}
     </Grid>
   );
-}
+};
 
-export default withStyles(styles, { withTheme: true }) (Home);
+export default withStyles(styles, { withTheme: true })(Home);
