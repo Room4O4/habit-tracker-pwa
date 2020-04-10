@@ -26,21 +26,28 @@ const Home = (props) => {
   const [timeSeries, setTimeSeries] = useState([]);
 
   const MAX_DAYS = 14;
-  const [startDate, setStartDate] = useState(+new Date());
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const [endDate, setEndDate] = useState(+new Date());
 
   const findCompletedDatesForHabit = (habitId) => {
-    return timeSeries.filter((item) => item.habitIds.includes(habitId)).map((item) => ({ date: item.date }));
+    return timeSeries
+      .filter((item) => item.habitIds.includes(habitId))
+      .map((item) => ({ date: item.date }));
   };
 
   const habitClicked = (habitInfo) => {
-    const foundEntry = timeSeries.find((item) => item.date.getTime() === habitInfo.date.getTime());
+    const foundEntry = timeSeries.find(
+      (item) => item.date.getTime() === habitInfo.date.getTime()
+    );
     if (!foundEntry) {
       timeSeries.push({
         date: habitInfo.date,
         habitIds: [`${habitInfo.id}`],
       });
     } else {
-      const habitIndex = foundEntry.habitIds.findIndex((habitId) => habitId === habitInfo.id);
+      const habitIndex = foundEntry.habitIds.findIndex(
+        (habitId) => habitId === habitInfo.id
+      );
       // delete the habit entry for the date
       if (habitIndex === -1) {
         foundEntry.habitIds.push(habitInfo.id);
@@ -52,14 +59,55 @@ const Home = (props) => {
   };
 
   const isHabitCompletedOnDate = (habitId, date) => {
-    const foundEntry = timeSeries.find((entry) => entry.date.getTime() === date.getTime());
+    const foundEntry = timeSeries.find(
+      (entry) => entry.date.getTime() === date.getTime()
+    );
     console.log('habitId - ' + habitId + ', foundEntry - ' + foundEntry);
     return foundEntry && foundEntry.habitIds.includes(habitId);
   };
 
+  const isToday = (date) => {
+    return moment(new Date()).format('DD-MM-YYYY') == date;
+  };
+
+  const buildDateLabel = () => {
+    return [...Array(MAX_DAYS).keys()].map((dayNumber) => {
+      const dateId = moment(endDate)
+        .subtract(MAX_DAYS - (dayNumber + 1), 'days')
+        .format('DD-MM-YYYY');
+      const dateObj = moment(dateId, 'DD-MM-YYYY').toDate();
+      return (
+        <div
+          className={
+            isToday(dateId)
+              ? `${classes.dateHeader} ${classes.today}`
+              : classes.dateHeader
+          }
+        >
+          <div>{days[dateObj.getDay()]}</div>
+          <div>{dateObj.getDate()}</div>
+        </div>
+      );
+    });
+  };
+
+  const buildDateHeader = () => {
+    return (
+      <Grid item xs={12}>
+        <Grid container justify="center">
+          <Grid item xs={2} />
+          <Grid item xs={6} md={8} className={classes.habitGrid}>
+            {buildDateLabel()}
+          </Grid>
+        </Grid>
+      </Grid>
+    );
+  };
   const buildTimelineForHabit = (habitId) => {
     return [...Array(MAX_DAYS).keys()].map((dayNumber) => {
-      const dateId = moment(startDate).add(dayNumber, 'days').format('DD-MM-YYYY');
+      const dateId = moment(endDate)
+        .subtract(MAX_DAYS - (dayNumber + 1), 'days')
+        .format('DD-MM-YYYY');
       const dateObj = moment(dateId, 'DD-MM-YYYY').toDate();
       return (
         <div
@@ -81,6 +129,7 @@ const Home = (props) => {
 
   return (
     <Grid container className={classes.root} spacing={1} justify="center">
+      {buildDateHeader()}
       {userData.habits.map((habit) => {
         return (
           <Grid item xs={12} key={habit.id}>
@@ -91,13 +140,13 @@ const Home = (props) => {
               <Grid item xs={6} md={8} className={classes.habitGrid}>
                 {buildTimelineForHabit(habit.id)}
               </Grid>
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <CalendarHeatmap
-                  startDate={new Date('2020-04-01')}
-                  endDate={new Date('2020-12-01')}
+                  startDate={new Date('2020-01-01')}
+                  endDate={new Date('2021-01-01')}
                   values={findCompletedDatesForHabit(habit.id)}
                 />
-              </Grid>
+              </Grid> */}
             </Grid>
           </Grid>
         );
