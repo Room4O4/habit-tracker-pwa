@@ -1,6 +1,7 @@
 export const styles = theme => ({
     root: {
-        flexGrow: 1
+        flexGrow: 1,
+        padding: 32,
       },
       paper: {
         height: '32',
@@ -8,14 +9,23 @@ export const styles = theme => ({
       },
       habitGrid: {
         display: 'flex',
-        justifyContent: 'space-evenly'
+        justifyContent: 'space-between',
       },
       habitLabel: {
         width: 'auto',
         height: 16,
-        margin: 8
+        marginTop: 16,
+        marginRight: 8,
+        textAlign: 'center'
       },
-      checkBoxHolder: {
-        margin: 4
+      habitBox: {
+        margin: 4,
+        backgroundColor: '#bdc3c7',
+        height: 48,
+        width: 48,
+        flexShrink: 0
+      },
+      selectedHabitColor: {
+        backgroundColor: '#27ae60'
       }
 }); 
