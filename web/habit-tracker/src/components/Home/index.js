@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Grid } from '@material-ui/core';
 import moment from 'moment';
+import uuid from 'react-uuid';
 import { styles } from '../../styles/Home/index.styles';
 
 import UIFab from '../controls/UIFab';
@@ -8,11 +9,15 @@ import AddIcon from '@material-ui/icons/Add';
 import { withStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
 import { DataProviderContext } from '../../providers/DataProvider';
+import AddHabitDialog from '../dialogs/AddHabitDialog';
 
 const Home = (props) => {
   const { classes } = props;
 
   const [endDate, setEndDate] = useState(new Date());
+  const [shouldShowAddHabitDialog, setShouldShowAddHabitDialog] = useState(
+    false
+  );
 
   const { userData, timeSeries, setUserData, setTimeSeries } = useContext(
     DataProviderContext
@@ -118,7 +123,22 @@ const Home = (props) => {
     });
   };
 
-  const onAddHabitClick = () => {};
+  const onAddHabitClick = () => {
+    setShouldShowAddHabitDialog(true);
+  };
+
+  const onAddHabitCancelled = () => {
+    setShouldShowAddHabitDialog(false);
+  };
+
+  const onHabitAdded = (habitName) => {
+    userData.habits.push({
+      id: uuid(),
+      description: habitName,
+    });
+    setUserData({ ...userData });
+    setShouldShowAddHabitDialog(false);
+  };
 
   const renderAddHabitFab = () => {
     return (
@@ -146,6 +166,12 @@ const Home = (props) => {
             </Grid>
           );
         })}
+      {shouldShowAddHabitDialog && (
+        <AddHabitDialog
+          onAddHabitCancelled={onAddHabitCancelled}
+          onHabitAdded={onHabitAdded}
+        />
+      )}
       {renderAddHabitFab()}
     </Grid>
   );
