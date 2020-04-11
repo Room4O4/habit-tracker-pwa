@@ -1,12 +1,16 @@
+import moment from 'moment';
 import React, { useState } from 'react';
 
+import AddIcon from '@material-ui/icons/Add';
 import { withStyles } from '@material-ui/core/styles';
 import { Grid, TextField } from '@material-ui/core';
-import moment from 'moment';
+import UIFab from '../controls/UIFab';
 
 import { styles } from '../../styles/Home/index.styles';
+
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
+
 const Home = (props) => {
   const { classes } = props;
 
@@ -24,10 +28,13 @@ const Home = (props) => {
     ],
   });
   const [timeSeries, setTimeSeries] = useState([]);
+  const [endDate, setEndDate] = useState(+new Date());
+  const [shouldShowAddHabitDialog, setShouldShowAddHabitDialog] = useState(
+    false
+  );
 
   const MAX_DAYS = 14;
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const [endDate, setEndDate] = useState(+new Date());
 
   const findCompletedDatesForHabit = (habitId) => {
     return timeSeries
@@ -127,6 +134,18 @@ const Home = (props) => {
     });
   };
 
+  const onAddHabitClick = () => {
+    setShouldShowAddHabitDialog(true);
+  };
+
+  const renderAddHabitFab = () => {
+    return (
+      <UIFab onClick={onAddHabitClick}>
+        <AddIcon />
+      </UIFab>
+    );
+  };
+
   return (
     <Grid container className={classes.root} spacing={1} justify="center">
       {buildDateHeader()}
@@ -151,6 +170,7 @@ const Home = (props) => {
           </Grid>
         );
       })}
+      {renderAddHabitFab()}
     </Grid>
   );
 };
