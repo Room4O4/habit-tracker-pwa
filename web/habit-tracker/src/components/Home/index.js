@@ -29,7 +29,7 @@ const Home = (props) => {
   // };
 
   const habitClicked = (habitInfo) => {
-    const foundEntry = timeSeries.find((item) => item.date.getTime() === habitInfo.date.getTime());
+    const foundEntry = timeSeries.find((item) => moment(item.date).toDate().getTime() === habitInfo.date.getTime());
     if (!foundEntry) {
       timeSeries.push({
         date: habitInfo.date,
@@ -48,7 +48,6 @@ const Home = (props) => {
   };
 
   const isHabitCompletedOnDate = (habitId, date) => {
-    console.log('timeseries - ', timeSeries);
     const foundEntry = timeSeries.find((entry) => moment(entry.date).toDate().getTime() === date.getTime());
     return foundEntry && foundEntry.habitIds.includes(habitId);
   };
