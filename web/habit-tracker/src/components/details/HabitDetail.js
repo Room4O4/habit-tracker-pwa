@@ -1,7 +1,6 @@
 import React from 'react';
 import { Grid } from '@material-ui/core';
 import moment from 'moment';
-//findCompletedDatesForHabit(habit.id)
 import { styles } from '../../styles/details/HabitDetail.styles';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
@@ -11,6 +10,7 @@ import { useParams } from 'react-router-dom';
 
 const HabitDetail = (props) => {
   const { id } = useParams();
+  const { classes } = props;
 
   return (
     <DataConsumer>
@@ -22,8 +22,10 @@ const HabitDetail = (props) => {
         };
 
         return (
-          <Grid item xs={12}>
-            <CalendarHeatmap startDate={startDate} endDate={endDate} values={findCompletedDatesForHabit(id)} />
+          <Grid container className={classes.root}>
+            <Grid item xs={12}>
+              <CalendarHeatmap startDate={startDate} endDate={endDate} values={findCompletedDatesForHabit(id)} />
+            </Grid>
           </Grid>
         );
       }}
