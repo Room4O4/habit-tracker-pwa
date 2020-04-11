@@ -16,7 +16,10 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const tokenInfo = localStorage.getItem('tokenInfo');
     let currentTimeStamp = +new Date() / 1000;
-    if (tokenInfo && Number(JSON.parse(tokenInfo).expires_at) > currentTimeStamp) {
+    if (
+      tokenInfo &&
+      Number(JSON.parse(tokenInfo).expires_at) > currentTimeStamp
+    ) {
       setAuthState(AUTH_STATE_LOGIN_SUCCESS);
     } else {
       setAuthState(AUTH_STATE_LOGIN_FAILED);
@@ -24,9 +27,19 @@ const AuthProvider = ({ children }) => {
     }
   });
 
-  return <AuthContext.Provider value={{ authState, userInfo, setAuthState, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ authState, userInfo, setAuthState, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 const AuthConsumer = AuthContext.Consumer;
 
-export { AuthProvider, AuthConsumer, AUTH_STATE_LOGIN_FAILED, AUTH_STATE_LOGIN_SUCCESS, AUTH_STATE_UNDEFINED };
+export {
+  AuthProvider,
+  AuthConsumer,
+  AUTH_STATE_LOGIN_FAILED,
+  AUTH_STATE_LOGIN_SUCCESS,
+  AUTH_STATE_UNDEFINED,
+};

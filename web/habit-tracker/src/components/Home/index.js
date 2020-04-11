@@ -1,46 +1,31 @@
+import React, { useState, useContext } from 'react';
+import { Grid } from '@material-ui/core';
 import moment from 'moment';
-import React, { useState } from 'react';
-
-import AddIcon from '@material-ui/icons/Add';
-import { withStyles } from '@material-ui/core/styles';
-import { Grid, TextField } from '@material-ui/core';
-import UIFab from '../controls/UIFab';
-
 import { styles } from '../../styles/Home/index.styles';
 
-import CalendarHeatmap from 'react-calendar-heatmap';
-import 'react-calendar-heatmap/dist/styles.css';
+import UIFab from '../controls/UIFab';
+import AddIcon from '@material-ui/icons/Add';
+import { withStyles } from '@material-ui/core/styles';
+import { Link } from 'react-router-dom';
+import { DataProviderContext } from '../../providers/DataProvider';
 
 const Home = (props) => {
   const { classes } = props;
 
-  const [userData, setUserData] = useState({
-    userName: '',
-    habits: [
-      {
-        id: '1',
-        description: 'Do One Pushup a day',
-      },
-      {
-        id: '2',
-        description: 'Wake up at 5 AM',
-      },
-    ],
-  });
-  const [timeSeries, setTimeSeries] = useState([]);
-  const [endDate, setEndDate] = useState(+new Date());
-  const [shouldShowAddHabitDialog, setShouldShowAddHabitDialog] = useState(
-    false
+  const [endDate, setEndDate] = useState(new Date());
+
+  const { userData, timeSeries, setUserData, setTimeSeries } = useContext(
+    DataProviderContext
   );
 
   const MAX_DAYS = 14;
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  const findCompletedDatesForHabit = (habitId) => {
-    return timeSeries
-      .filter((item) => item.habitIds.includes(habitId))
-      .map((item) => ({ date: item.date }));
-  };
+  // const findCompletedDatesForHabit = (habitId) => {
+  //   return timeSeries
+  //     .filter((item) => item.habitIds.includes(habitId))
+  //     .map((item) => ({ date: item.date }));
+  // };
 
   const habitClicked = (habitInfo) => {
     const foundEntry = timeSeries.find(
@@ -69,12 +54,11 @@ const Home = (props) => {
     const foundEntry = timeSeries.find(
       (entry) => entry.date.getTime() === date.getTime()
     );
-    console.log('habitId - ' + habitId + ', foundEntry - ' + foundEntry);
     return foundEntry && foundEntry.habitIds.includes(habitId);
   };
 
   const isToday = (date) => {
-    return moment(new Date()).format('DD-MM-YYYY') == date;
+    return moment(new Date()).format('DD-MM-YYYY') === date;
   };
 
   const buildDateLabel = () => {
@@ -134,9 +118,7 @@ const Home = (props) => {
     });
   };
 
-  const onAddHabitClick = () => {
-    setShouldShowAddHabitDialog(true);
-  };
+  const onAddHabitClick = () => {};
 
   const renderAddHabitFab = () => {
     return (
@@ -149,27 +131,21 @@ const Home = (props) => {
   return (
     <Grid container className={classes.root} spacing={1} justify="center">
       {buildDateHeader()}
-      {userData.habits.map((habit) => {
-        return (
-          <Grid item xs={12} key={habit.id}>
-            <Grid container justify="center">
-              <Grid item xs={2} className={classes.habitLabel}>
-                {habit.description}
+      {userData &&
+        userData.habits.map((habit) => {
+          return (
+            <Grid item xs={12} key={habit.id}>
+              <Grid container justify="center">
+                <Grid item xs={2} className={classes.habitLabel}>
+                  <Link to="/habit/1">{habit.description}</Link>
+                </Grid>
+                <Grid item xs={6} md={8} className={classes.habitGrid}>
+                  {buildTimelineForHabit(habit.id)}
+                </Grid>
               </Grid>
-              <Grid item xs={6} md={8} className={classes.habitGrid}>
-                {buildTimelineForHabit(habit.id)}
-              </Grid>
-              {/* <Grid item xs={12}>
-                <CalendarHeatmap
-                  startDate={new Date('2020-01-01')}
-                  endDate={new Date('2021-01-01')}
-                  values={findCompletedDatesForHabit(habit.id)}
-                />
-              </Grid> */}
             </Grid>
-          </Grid>
-        );
-      })}
+          );
+        })}
       {renderAddHabitFab()}
     </Grid>
   );
