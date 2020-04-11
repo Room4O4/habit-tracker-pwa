@@ -15,36 +15,22 @@ const Home = (props) => {
   const { classes } = props;
 
   const [endDate, setEndDate] = useState(new Date());
-  const [shouldShowAddHabitDialog, setShouldShowAddHabitDialog] = useState(
-    false
-  );
+  const [shouldShowAddHabitDialog, setShouldShowAddHabitDialog] = useState(false);
 
-  const { userData, timeSeries, setUserData, setTimeSeries } = useContext(
-    DataProviderContext
-  );
+  const { userData, timeSeries, updateUserData, updateTimeSeries } = useContext(DataProviderContext);
 
   const MAX_DAYS = 14;
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  // const findCompletedDatesForHabit = (habitId) => {
-  //   return timeSeries
-  //     .filter((item) => item.habitIds.includes(habitId))
-  //     .map((item) => ({ date: item.date }));
-  // };
-
   const habitClicked = (habitInfo) => {
-    const foundEntry = timeSeries.find(
-      (item) => item.date.getTime() === habitInfo.date.getTime()
-    );
+    const foundEntry = timeSeries.find((item) => moment(item.date).toDate().getTime() === habitInfo.date.getTime());
     if (!foundEntry) {
       timeSeries.push({
         date: habitInfo.date,
         habitIds: [`${habitInfo.id}`],
       });
     } else {
-      const habitIndex = foundEntry.habitIds.findIndex(
-        (habitId) => habitId === habitInfo.id
-      );
+      const habitIndex = foundEntry.habitIds.findIndex((habitId) => habitId === habitInfo.id);
       // delete the habit entry for the date
       if (habitIndex === -1) {
         foundEntry.habitIds.push(habitInfo.id);
@@ -52,13 +38,11 @@ const Home = (props) => {
         foundEntry.habitIds.splice(habitIndex, 1);
       }
     }
-    setTimeSeries([...timeSeries]);
+    updateTimeSeries([...timeSeries]);
   };
 
   const isHabitCompletedOnDate = (habitId, date) => {
-    const foundEntry = timeSeries.find(
-      (entry) => entry.date.getTime() === date.getTime()
-    );
+    const foundEntry = timeSeries.find((entry) => moment(entry.date).toDate().getTime() === date.getTime());
     return foundEntry && foundEntry.habitIds.includes(habitId);
   };
 
@@ -73,13 +57,7 @@ const Home = (props) => {
         .format('DD-MM-YYYY');
       const dateObj = moment(dateId, 'DD-MM-YYYY').toDate();
       return (
-        <div
-          className={
-            isToday(dateId)
-              ? `${classes.dateHeader} ${classes.today}`
-              : classes.dateHeader
-          }
-        >
+        <div className={isToday(dateId) ? `${classes.dateHeader} ${classes.today}` : classes.dateHeader}>
           <div>{days[dateObj.getDay()]}</div>
           <div>{dateObj.getDate()}</div>
         </div>
@@ -136,7 +114,7 @@ const Home = (props) => {
       id: uuid(),
       description: habitName,
     });
-    setUserData({ ...userData });
+    updateUserData({ ...userData });
     setShouldShowAddHabitDialog(false);
   };
 
@@ -157,7 +135,7 @@ const Home = (props) => {
             <Grid item xs={12} key={habit.id}>
               <Grid container justify="center">
                 <Grid item xs={2} className={classes.habitLabel}>
-                  <Link to="/habit/1">{habit.description}</Link>
+                  <Link to={`/habit/${habit.id}`}>{habit.description}</Link>
                 </Grid>
                 <Grid item xs={6} md={8} className={classes.habitGrid}>
                   {buildTimelineForHabit(habit.id)}
@@ -167,10 +145,7 @@ const Home = (props) => {
           );
         })}
       {shouldShowAddHabitDialog && (
-        <AddHabitDialog
-          onAddHabitCancelled={onAddHabitCancelled}
-          onHabitAdded={onHabitAdded}
-        />
+        <AddHabitDialog onAddHabitCancelled={onAddHabitCancelled} onHabitAdded={onHabitAdded} />
       )}
       {renderAddHabitFab()}
     </Grid>
