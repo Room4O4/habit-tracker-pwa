@@ -1,43 +1,50 @@
-import React, { useState } from 'react';
-
-import { withStyles } from '@material-ui/core/styles';
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import CheckCircleOutlineRoundedIcon from '@material-ui/icons/CheckCircleOutlineRounded';
-import { Grid, TextField } from '@material-ui/core';
+import React, { useState, useContext } from 'react';
+import { Grid } from '@material-ui/core';
 import moment from 'moment';
-
+import uuid from 'react-uuid';
 import { styles } from '../../styles/Home/index.styles';
 
-const Home = props => {
+import UIFab from '../controls/UIFab';
+import AddIcon from '@material-ui/icons/Add';
+import { withStyles } from '@material-ui/core/styles';
+import { Link } from 'react-router-dom';
+import { DataProviderContext } from '../../providers/DataProvider';
+import AddHabitDialog from '../dialogs/AddHabitDialog';
+
+const Home = (props) => {
   const { classes } = props;
 
-  const [userData, setUserData] = useState({
-    userName: '',
-    habits: [
-      {
-        id: '1',
-        description: 'Do One Pushup a day'
-      },
-      {
-        id: '2',
-        description: 'Wake up at 5 AM'
-      }
-    ]
-  });
-  const [timeSeries, setTimeSeries] = useState([]);
+  const [endDate, setEndDate] = useState(new Date());
+  const [shouldShowAddHabitDialog, setShouldShowAddHabitDialog] = useState(
+    false
+  );
 
-  const MAX_DAYS = 30;
-  const [startDate, setStartDate] = useState(+new Date());
+  const { userData, timeSeries, setUserData, setTimeSeries } = useContext(
+    DataProviderContext
+  );
 
-  const checkBoxClicked = habitInfo => {
-    const foundEntry = timeSeries.find(item => item.date.getTime() === habitInfo.date.getTime());
+  const MAX_DAYS = 14;
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  // const findCompletedDatesForHabit = (habitId) => {
+  //   return timeSeries
+  //     .filter((item) => item.habitIds.includes(habitId))
+  //     .map((item) => ({ date: item.date }));
+  // };
+
+  const habitClicked = (habitInfo) => {
+    const foundEntry = timeSeries.find(
+      (item) => item.date.getTime() === habitInfo.date.getTime()
+    );
     if (!foundEntry) {
       timeSeries.push({
         date: habitInfo.date,
-        habitIds: [`${habitInfo.id}`]
+        habitIds: [`${habitInfo.id}`],
       });
     } else {
-      const habitIndex = foundEntry.habitIds.findIndex(habitId => habitId === habitInfo.id);
+      const habitIndex = foundEntry.habitIds.findIndex(
+        (habitId) => habitId === habitInfo.id
+      );
       // delete the habit entry for the date
       if (habitIndex === -1) {
         foundEntry.habitIds.push(habitInfo.id);
@@ -48,54 +55,124 @@ const Home = props => {
     setTimeSeries([...timeSeries]);
   };
 
-  const renderCheckBox = (habitId, date) => {
-    const foundEntry = timeSeries.find(entry => entry.date.getTime() === date.getTime());
-    console.log('habitId - ' + habitId + ', foundEntry - ' + foundEntry);
-    if (foundEntry && foundEntry.habitIds.includes(habitId)) {
-      return <CheckCircleOutlineRoundedIcon />;
-    } else {
-      return <CheckBoxOutlineBlankIcon />;
-    }
+  const isHabitCompletedOnDate = (habitId, date) => {
+    const foundEntry = timeSeries.find(
+      (entry) => entry.date.getTime() === date.getTime()
+    );
+    return foundEntry && foundEntry.habitIds.includes(habitId);
   };
 
-  const buildCheckBoxesForHabit = habitId => {
-    return [...Array(MAX_DAYS).keys()].map(dayNumber => {
-      const dateId = moment(startDate)
-        .add(dayNumber, 'days')
+  const isToday = (date) => {
+    return moment(new Date()).format('DD-MM-YYYY') === date;
+  };
+
+  const buildDateLabel = () => {
+    return [...Array(MAX_DAYS).keys()].map((dayNumber) => {
+      const dateId = moment(endDate)
+        .subtract(MAX_DAYS - (dayNumber + 1), 'days')
         .format('DD-MM-YYYY');
       const dateObj = moment(dateId, 'DD-MM-YYYY').toDate();
       return (
         <div
-          className={classes.checkBoxHolder}
-          onClick={() =>
-            checkBoxClicked({
-              id: habitId,
-              date: dateObj
-            })
+          className={
+            isToday(dateId)
+              ? `${classes.dateHeader} ${classes.today}`
+              : classes.dateHeader
           }
         >
-          {renderCheckBox(habitId, dateObj)}
+          <div>{days[dateObj.getDay()]}</div>
+          <div>{dateObj.getDate()}</div>
         </div>
       );
     });
   };
 
+  const buildDateHeader = () => {
+    return (
+      <Grid item xs={12}>
+        <Grid container justify="center">
+          <Grid item xs={2} />
+          <Grid item xs={6} md={8} className={classes.habitGrid}>
+            {buildDateLabel()}
+          </Grid>
+        </Grid>
+      </Grid>
+    );
+  };
+  const buildTimelineForHabit = (habitId) => {
+    return [...Array(MAX_DAYS).keys()].map((dayNumber) => {
+      const dateId = moment(endDate)
+        .subtract(MAX_DAYS - (dayNumber + 1), 'days')
+        .format('DD-MM-YYYY');
+      const dateObj = moment(dateId, 'DD-MM-YYYY').toDate();
+      return (
+        <div
+          className={
+            isHabitCompletedOnDate(habitId, dateObj)
+              ? `${classes.habitBox} ${classes.selectedHabitColor}`
+              : classes.habitBox
+          }
+          onClick={() =>
+            habitClicked({
+              id: habitId,
+              date: dateObj,
+            })
+          }
+        ></div>
+      );
+    });
+  };
+
+  const onAddHabitClick = () => {
+    setShouldShowAddHabitDialog(true);
+  };
+
+  const onAddHabitCancelled = () => {
+    setShouldShowAddHabitDialog(false);
+  };
+
+  const onHabitAdded = (habitName) => {
+    userData.habits.push({
+      id: uuid(),
+      description: habitName,
+    });
+    setUserData({ ...userData });
+    setShouldShowAddHabitDialog(false);
+  };
+
+  const renderAddHabitFab = () => {
+    return (
+      <UIFab onClick={onAddHabitClick}>
+        <AddIcon />
+      </UIFab>
+    );
+  };
+
   return (
-    <Grid container className={classes.root} spacing={1}>
-      {userData.habits.map(habit => {
-        return (
-          <Grid item xs={12} key={habit.id}>
-            <Grid container>
-              <Grid item xs={2}>
-                <TextField className={classes.habitLabel} defaultValue={habit.description}></TextField>
-              </Grid>
-              <Grid item xs={10} className={classes.habitGrid}>
-                {buildCheckBoxesForHabit(habit.id)}
+    <Grid container className={classes.root} spacing={1} justify="center">
+      {buildDateHeader()}
+      {userData &&
+        userData.habits.map((habit) => {
+          return (
+            <Grid item xs={12} key={habit.id}>
+              <Grid container justify="center">
+                <Grid item xs={2} className={classes.habitLabel}>
+                  <Link to="/habit/1">{habit.description}</Link>
+                </Grid>
+                <Grid item xs={6} md={8} className={classes.habitGrid}>
+                  {buildTimelineForHabit(habit.id)}
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
-        );
-      })}
+          );
+        })}
+      {shouldShowAddHabitDialog && (
+        <AddHabitDialog
+          onAddHabitCancelled={onAddHabitCancelled}
+          onHabitAdded={onHabitAdded}
+        />
+      )}
+      {renderAddHabitFab()}
     </Grid>
   );
 };

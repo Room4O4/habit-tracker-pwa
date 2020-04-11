@@ -7,6 +7,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import { Route, Switch, BrowserRouter as Router } from 'react-router-dom';
 import RedirectCallback from './components/auth/RedirectCallback';
 import { AuthProvider } from './providers/auth';
+import HabitDetail from './components/details/HabitDetail';
+import { DataProvider } from './providers/DataProvider';
 
 const App = () => {
   const theme = createMuiTheme({
@@ -18,10 +20,13 @@ const App = () => {
       <Router>
         <ThemeProvider theme={theme}>
           <AuthProvider>
-            <Switch>
-              <ProtectedRoute exact path="/" component={Home} />
-              <Route exact path="/redirect" component={RedirectCallback} />
-            </Switch>
+            <DataProvider>
+              <Switch>
+                <ProtectedRoute exact path="/" component={Home} />
+                <ProtectedRoute exact path="/habit/:id" component={HabitDetail} />
+                <Route exact path="/redirect" component={RedirectCallback} />
+              </Switch>
+            </DataProvider>
           </AuthProvider>
         </ThemeProvider>
       </Router>
