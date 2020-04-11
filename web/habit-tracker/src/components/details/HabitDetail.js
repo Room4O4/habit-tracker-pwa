@@ -6,18 +6,28 @@ import { styles } from '../../styles/details/HabitDetail.styles';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 import { withStyles } from '@material-ui/core/styles';
+import { DataConsumer } from '../../providers/DataProvider';
+import { useParams } from 'react-router-dom';
 
 const HabitDetail = (props) => {
-  const startDate = moment(Date.now()).subtract(1, 'year');
-  const endDate = Date.now();
+  const { id } = useParams();
+
   return (
-    <Grid item xs={12}>
-      <CalendarHeatmap
-        startDate={startDate}
-        endDate={endDate}
-        values={props.entries}
-      />
-    </Grid>
+    <DataConsumer>
+      {({ userData, timeSeries }) => {
+        const startDate = moment(Date.now()).subtract(1, 'year');
+        const endDate = Date.now();
+        const findCompletedDatesForHabit = (habitId) => {
+          return timeSeries.filter((item) => item.habitIds.includes(habitId)).map((item) => ({ date: item.date }));
+        };
+
+        return (
+          <Grid item xs={12}>
+            <CalendarHeatmap startDate={startDate} endDate={endDate} values={findCompletedDatesForHabit(id)} />
+          </Grid>
+        );
+      }}
+    </DataConsumer>
   );
 };
 

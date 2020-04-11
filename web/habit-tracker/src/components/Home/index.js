@@ -22,12 +22,6 @@ const Home = (props) => {
   const MAX_DAYS = 14;
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  // const findCompletedDatesForHabit = (habitId) => {
-  //   return timeSeries
-  //     .filter((item) => item.habitIds.includes(habitId))
-  //     .map((item) => ({ date: item.date }));
-  // };
-
   const habitClicked = (habitInfo) => {
     const foundEntry = timeSeries.find((item) => moment(item.date).toDate().getTime() === habitInfo.date.getTime());
     if (!foundEntry) {
@@ -141,7 +135,7 @@ const Home = (props) => {
             <Grid item xs={12} key={habit.id}>
               <Grid container justify="center">
                 <Grid item xs={2} className={classes.habitLabel}>
-                  <Link to="/habit/1">{habit.description}</Link>
+                  <Link to={`/habit/${habit.id}`}>{habit.description}</Link>
                 </Grid>
                 <Grid item xs={6} md={8} className={classes.habitGrid}>
                   {buildTimelineForHabit(habit.id)}
