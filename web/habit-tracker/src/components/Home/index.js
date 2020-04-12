@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
-import { Grid } from '@material-ui/core';
+import { Grid, useMediaQuery } from '@material-ui/core';
+import { useTheme } from '@material-ui/core/styles';
 import moment from 'moment';
 import uuid from 'react-uuid';
 import { styles } from '../../styles/Home/index.styles';
@@ -11,15 +12,37 @@ import { Link } from 'react-router-dom';
 import { DataProviderContext } from '../../providers/DataProvider';
 import AddHabitDialog from '../dialogs/AddHabitDialog';
 
+const daysToDisplay = {
+  xs: 5,
+  sm: 7,
+  md: 10,
+  lg: 14,
+  xl: 14,
+};
+
+const useWidth = () => {
+  const theme = useTheme();
+  const keys = [...theme.breakpoints.keys].reverse();
+  return (
+    keys.reduce((output, key) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const matches = useMediaQuery(theme.breakpoints.up(key));
+      return !output && matches ? key : output;
+    }, null) || 'xs'
+  );
+};
+
 const Home = (props) => {
   const { classes } = props;
+
+  let width = useWidth();
+  let MAX_DAYS = daysToDisplay[width];
 
   const [endDate, setEndDate] = useState(new Date());
   const [shouldShowAddHabitDialog, setShouldShowAddHabitDialog] = useState(false);
 
   const { userData, timeSeries, updateUserData, updateTimeSeries } = useContext(DataProviderContext);
 
-  const MAX_DAYS = 14;
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const habitClicked = (habitInfo) => {
@@ -70,7 +93,7 @@ const Home = (props) => {
       <Grid item xs={12}>
         <Grid container justify="center">
           <Grid item xs={2} />
-          <Grid item xs={6} md={8} className={classes.habitGrid}>
+          <Grid item xs={6} md={8} className={classes.dateGrid}>
             {buildDateLabel()}
           </Grid>
         </Grid>
