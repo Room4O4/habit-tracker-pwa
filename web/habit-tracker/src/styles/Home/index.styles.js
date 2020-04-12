@@ -28,9 +28,14 @@ export const styles = (theme) => ({
   selectedHabitColor: {
     backgroundColor: '#8cc665',
   },
+  dateGrid: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
   dateHeader: {
     height: 48,
     width: 48,
+    margin: 4,
     textAlign: 'center',
     flexShrink: 0,
   },
