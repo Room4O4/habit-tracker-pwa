@@ -1,0 +1,39 @@
+{
+  "name": "habit-tracker-pwa",
+  "version": "1.0.0",
+  "description": "A progressive web app for tracking habits",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node server.js",
+    "build": "next build",
+    "start": "NODE_ENV=production node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Room4O4/habit-tracker-pwa.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Room4O4/habit-tracker-pwa/issues"
+  },
+  "homepage": "https://github.com/Room4O4/habit-tracker-pwa#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "next": "^9.3.5",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "@material-ui/core": "^4.9.7",
+    "@material-ui/icons": "^4.9.1",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "date-streaks": "^1.2.1",
+    "moment": "^2.24.0",
+    "query-string": "^6.11.1",
+    "react-calendar-heatmap": "^1.8.1",
+    "react-uuid": "^1.0.2"
+  }
+}
